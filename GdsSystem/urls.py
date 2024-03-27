@@ -20,7 +20,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 from .views import UserCreateView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('token/', obtain_auth_token, name='token'),
-    path('create_user/', UserCreateView.as_view(), name='create_user'),
+    path('admin', admin.site.urls),
+    path('token', obtain_auth_token, name='token'),
+    path('create_user', UserCreateView.as_view(), name='create_user'),
 ]
