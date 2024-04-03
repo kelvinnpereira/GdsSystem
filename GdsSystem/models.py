@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class Projeto(models.Model):
@@ -142,21 +144,21 @@ class Projeto(models.Model):
     imagem = models.FileField()
     conteudo = models.CharField(max_length=255)
     grau = models.CharField(max_length=255, choices=GRAU)
-    serie = models.CharField(max_length=255)
-    disciplina = models.CharField(max_length=255)
-    estilo = models.CharField(max_length=255)
-    interesse = models.CharField(max_length=255)
-    habilidade = models.CharField(max_length=255)
-    recompensa = models.CharField(max_length=255)
-    competicao = models.CharField(max_length=255)
-    recurso = models.CharField(max_length=255)
-    limitacao = models.CharField(max_length=255)
-    tema = models.CharField(max_length=255)
-    problema = models.CharField(max_length=255)
-    regra = models.CharField(max_length=255)
-    detalhe = models.CharField(max_length=255)
-    historia = models.CharField(max_length=255)
-    vilao = models.CharField(max_length=255)
+    serie = models.CharField(max_length=255, choices=SERIE)
+    disciplina = models.CharField(max_length=255, choices=DISCIPLINA)
+    estilo = models.CharField(max_length=255, choices=ESTILO)
+    interesse = models.CharField(max_length=255, choices=INTERESSE)
+    habilidade = models.CharField(max_length=255, choices=HABILIDADE)
+    recompensa = models.CharField(max_length=255, choices=RECOMPENSA)
+    competicao = models.CharField(max_length=255, choices=COMPETICAO)
+    recurso = models.CharField(max_length=255, choices=RECURSO)
+    limitacao = models.CharField(max_length=255, choices=LIMITACAO)
+    tema = models.CharField(max_length=255, choices=TEMA)
+    problema = models.CharField(max_length=255, choices=PROBLEMA)
+    regra = models.CharField(max_length=255, choices=REGRA)
+    detalhe = models.CharField(max_length=255, choices=DETALHE)
+    historia = models.CharField(max_length=255, choices=HISTORIA)
+    vilao = models.CharField(max_length=255, choices=VILAO)
     enredo = models.CharField(max_length=255)
     emboscada = models.BooleanField()
     feridos = models.BooleanField()
@@ -175,13 +177,21 @@ class Projeto(models.Model):
     criado_em = models.DateField(auto_now_add=True)
 
     @staticmethod
-    def fields():
-        return [f.name for f in Projeto._meta.fields + Projeto._meta.many_to_many if 'id' not in f.name]
+    def fields_to_create():
+        return [
+            f.name
+            for f in Projeto._meta.fields + Projeto._meta.many_to_many
+            if 'id' != f.name and 'criado_em' != f.name and 'usuario' != f.name
+        ]
 
 
 class Perfil(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
-    projetos_salvos = models.ManyToManyField(Projeto)
+    projetos_salvos = models.ManyToManyField(Projeto, blank=True)
+    criado_em = models.DateField(auto_now_add=True)
 
 
-
+@receiver(post_save, sender=User)
+def criar_perfil(sender, instance, created, **kwargs):
+    if created:
+        Perfil.objects.create(usuario=instance)
