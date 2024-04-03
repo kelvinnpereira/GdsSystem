@@ -4,8 +4,10 @@ from .serializers import UserSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from GdsSystem.models import Projeto
+from GdsSystem.models import Projeto, Perfil
 from django.db.models import Q
+from django.core.paginator import Paginator
+
 
 class UserCreateView(generics.CreateAPIView):
     permission_classes = [AllowAny]
@@ -13,23 +15,106 @@ class UserCreateView(generics.CreateAPIView):
     serializer_class = UserSerializer
 
 
-class ProjetoApi(APIView):
+class PerfilAPI(APIView):
 
     def get(self, request, pk=None):
-        username = pk if pk else request.user.username
+        perfil = Perfil.objects.filter(usuario=request.user)
+        return Response({
+            'data': {
+                **perfil.values()[0],
+                'projetos_salvos': perfil.first().projetos_salvos.all().values(),
+            }
+        })
+
+    def salvar_projeto(self, request, pk=None):
+        perfil = Perfil.objects.get(usuario=request.user)
+        projeto_id = int(pk)
+        projeto = Projeto.objects.filter(~Q(usuario=request.user) & Q(id=projeto_id))
+        if not projeto.exists():
+            return Response({'error': 'Projeto não encontrado ou o projeto pertence ao usuario'})
+        perfil.projetos_salvos.add(projeto_id)
+        return Response({'data': f'Projeto ({projeto_id}) salvo com sucesso'})
+
+    def put(self, request, pk=None):
+        data = request.data
+        if data.get('type') == 'salvar_projeto':
+            return self.salvar_projeto(request, pk)
+        return Response({})
+
+
+class ProjetoAPI(APIView):
+
+    def get(self, request, pk=None):
+        projetos = Projeto.objects.all().order_by('-id')
         search = request.data.get('search')
-        query = Q(usuario__username=username)
+        if search:
+            projetos = projetos.filter((Q(titulo__contains=search) | Q(descricao__contains=search)))
+        paginator = Paginator(projetos, 10)
+        page_obj = paginator.get_page(request.data.get('page_number', 1))
+        return Response({'data': page_obj.object_list.values()})
+
+
+class ProjetoUsuarioAPI(APIView):
+
+    def get(self, request, pk=None):
+        query = Q(usuario__username=pk if pk else request.user.username)
+        search = request.data.get('search')
         if search:
             query &= (Q(titulo__contains=search) | Q(descricao__contains=search))
         projeto = Projeto.objects.filter(query)
         if not projeto.exists():
             return Response({'error': 'No project founded'})
-        projeto = projeto.values()[0]
-        return Response(projeto)
+        return Response({'data': projeto.values()})
 
     def post(self, request, pk=None):
-        if not all([field in request.data for field in Projeto.fields()]):
-            return Response({'error': 'Invalid fields'})
-        projeto = Projeto(**request.data)
-        projeto.save()
-        return Response({'novo_projeto': projeto.id})
+        data = request.data.dict()
+        if not all([field in data for field in Projeto.fields_to_create()]):
+            return Response({'error': 'Missing or Invalid fields'})
+        obj_to_create = {
+            **data,
+            'emboscada': bool(data['emboscada']),
+            'feridos': bool(data['feridos']),
+            'usuario': request.user,
+        }
+        try:
+            projeto = Projeto.objects.create(**obj_to_create)
+            return Response({'data': projeto.id})
+        except:
+            return Response({'error': 'Não foi possivel criar o projeto'})
+
+    def put(self, request, pk=None):
+        projeto = Projeto.objects.filter(id=int(pk))
+        if not projeto.exists():
+            return Response({'error': 'Id do projeto invalido ou não existe'})
+        projeto = projeto.filter(usuario=request.user)
+        if not projeto.exists():
+            return Response({'error': 'O usuario atual não pode editar o projeto por não ser o dono'})
+        data = request.data.dict()
+        if not all([field in data for field in Projeto.fields_to_create()]):
+            return Response({'error': 'Existem campos invalidos ou faltando'})
+        obj_to_create = {
+            **data,
+            'emboscada': bool(data['emboscada']),
+            'feridos': bool(data['feridos']),
+            'usuario': request.user,
+        }
+        try:
+            projeto.update(**obj_to_create)
+            return Response({'data': projeto.first().id})
+        except:
+            return Response({'error': 'Não foi possivel editar o projeto'})
+
+    def delete(self, request, pk=None):
+        projeto = Projeto.objects.filter(id=int(pk))
+        if not projeto.exists():
+            return Response({'error': 'Id do projeto invalido ou não existe'})
+        projeto = projeto.filter(usuario=request.user)
+        if not projeto.exists():
+            return Response({'error': 'O usuario atual não pode excluir o projeto por não ser o dono'})
+        try:
+            projeto_model = projeto.first()
+            message = f'Projeto ({projeto_model.id}) excluido com sucesso'
+            projeto.delete()
+            return Response({'data': message})
+        except:
+            return Response({'error': 'Não foi possivel excluir o projeto'})
