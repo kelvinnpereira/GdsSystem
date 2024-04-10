@@ -15,6 +15,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
 from .views import UserCreateView
@@ -29,4 +31,4 @@ urlpatterns = [
     path('projeto', ProjetoAPI.as_view(), name='projeto'),
     path('projeto_usuario', ProjetoUsuarioAPI.as_view(), name='projeto_usuario'),
     path('projeto_usuario/<pk>', ProjetoUsuarioAPI.as_view(), name='projeto_usuario'),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

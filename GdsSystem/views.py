@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from GdsSystem.models import Projeto, Perfil
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django.forms.models import model_to_dict
 
 
 class UserCreateView(generics.CreateAPIView):
@@ -49,9 +50,17 @@ class ProjetoAPI(APIView):
         search = request.data.get('search')
         if search:
             projetos = projetos.filter((Q(titulo__contains=search) | Q(descricao__contains=search)))
-        paginator = Paginator(projetos, 10)
+        paginator = Paginator(projetos, 100)
         page_obj = paginator.get_page(request.data.get('page_number', 1))
-        return Response({'data': page_obj.object_list.values()})
+        projetos = [
+            {
+                **model_to_dict(projeto),
+                'usuario': projeto.usuario.username,
+                'imagem': projeto.imagem.name,
+            }
+            for projeto in page_obj.object_list.select_related('usuario')
+        ]
+        return Response({'data': projetos})
 
 
 class ProjetoUsuarioAPI(APIView):
