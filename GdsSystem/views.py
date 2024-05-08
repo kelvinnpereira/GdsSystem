@@ -46,6 +46,11 @@ class PerfilAPI(APIView):
 class ProjetoAPI(APIView):
 
     def get(self, request, pk=None):
+        if isinstance(pk, str) and pk.isnumeric():
+            projeto = Projeto.objects.filter(id=int(pk))
+            if not projeto.exists():
+                return Response({'error': 'Projeto não encontrado'})
+            return Response({'data': projeto.values()[0]})
         projetos = Projeto.objects.all().order_by('-id')
         search = request.data.get('search')
         if search:

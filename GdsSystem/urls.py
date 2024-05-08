@@ -29,6 +29,7 @@ urlpatterns = [
     path('create_user', UserCreateView.as_view(), name='create_user'),
     path('perfil', PerfilAPI.as_view(), name='perfil'),
     path('projeto', ProjetoAPI.as_view(), name='projeto'),
+    path('projeto/<pk>', ProjetoAPI.as_view(), name='projeto'),
     path('projeto_usuario', ProjetoUsuarioAPI.as_view(), name='projeto_usuario'),
     path('projeto_usuario/<pk>', ProjetoUsuarioAPI.as_view(), name='projeto_usuario'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
