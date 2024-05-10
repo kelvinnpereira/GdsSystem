@@ -77,6 +77,12 @@ class Perfil(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     projetos_salvos = models.ManyToManyField(Projeto, blank=True)
     criado_em = models.DateField(auto_now_add=True)
+    bio = models.TextField(blank=True, null=True, default=None)
+    cidade = models.CharField(max_length=255, default=None, null=True, blank=True)
+    estado = models.CharField(max_length=255, default=None, null=True, blank=True)
+    pais = models.CharField(max_length=255, default=None, null=True, blank=True)
+    seguindo = models.ManyToManyField('self', blank=True)
+    seguidores = models.ManyToManyField('self', blank=True)
 
 
 @receiver(post_save, sender=User)

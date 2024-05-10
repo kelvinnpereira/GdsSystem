@@ -20,10 +20,31 @@ class PerfilAPI(APIView):
 
     def get(self, request, pk=None):
         perfil = Perfil.objects.filter(usuario=request.user)
+        if not perfil.exists():
+            return Response({'error': 'Perfil não encontrado'})
+        usuario = model_to_dict(request.user)
         return Response({
             'data': {
                 **perfil.values()[0],
-                'projetos_salvos': perfil.first().projetos_salvos.all().values(),
+                **usuario,
+                'projetos': [
+                    {
+                        **model_to_dict(projeto),
+                        'usuario': projeto.usuario.username,
+                        'imagem': projeto.imagem.name,
+                    }
+                    for projeto in Projeto.objects.filter(usuario=request.user).order_by('-id')
+                ],
+                'projetos_salvos': [
+                    {
+                        **model_to_dict(projeto),
+                        'usuario': projeto.usuario.username,
+                        'imagem': projeto.imagem.name,
+                    }
+                    for projeto in perfil.first().projetos_salvos.all().order_by('-id')
+                ],
+                'seguindo': perfil.first().seguindo.all().values(),
+                'seguidores': perfil.first().seguidores.all().values(),
             }
         })
 
