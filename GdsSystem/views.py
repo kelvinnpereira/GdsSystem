@@ -8,6 +8,9 @@ from GdsSystem.models import Projeto, Perfil
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.forms.models import model_to_dict
+import os
+import json
+import requests
 
 
 class UserCreateView(generics.CreateAPIView):
@@ -105,6 +108,32 @@ class ProjetoUsuarioAPI(APIView):
         data = request.data.dict()
         if not all([field in data for field in Projeto.fields_to_create()]):
             return Response({'error': 'Missing or Invalid fields'})
+        # ----------------------------------------Chat GPT request----------------------------------------
+        headers = {
+            'Authorization': f'Bearer {os.environ.get('OPENAI_API_KEY')}',
+            'Content-Type': 'application/json'
+        }
+        options_description = Projeto.options_description()
+        description = [
+            f'{options_description[key]}{data[key]}'
+            for key in options_description
+        ]
+        req_data = {
+            "model": "gpt-3.5-turbo",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": f"Monte o enredo de uma história com os seguintes temas:\n{"\n".join(description)}"
+                }
+            ],
+        }
+        response = requests.post('https://api.openai.com/v1/chat/completions', headers=headers, data=json.dumps(req_data))
+        if response.status_code == 200:
+            res_data = response.json()
+            data['descricao'] = res_data['choices'][0]['message']['content']
+        else:
+            return Response({'error': 'Não foi possivel criar a descrição do projeto com IA'})
+        # ----------------------------------------Chat GPT request----------------------------------------
         obj_to_create = {
             **data,
             'emboscada': bool(data['emboscada']),

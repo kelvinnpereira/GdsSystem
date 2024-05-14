@@ -7,7 +7,7 @@ from django.dispatch import receiver
 class Projeto(models.Model):
 
     titulo = models.CharField(max_length=255, default=None, null=True, blank=True)
-    descricao = models.CharField(max_length=255, default=None, null=True, blank=True)
+    descricao = models.TextField(default=None, null=True, blank=True)
     imagem = models.FileField(default=None, null=True, blank=True)
     grau = models.CharField(max_length=255, default=None, null=True, blank=True)
     disciplina = models.CharField(max_length=255, default=None, null=True, blank=True)
@@ -70,7 +70,48 @@ class Projeto(models.Model):
             and 'usuario' != f.name
             and 'likes' != f.name
             and 'visualizacoes' != f.name
+            and 'descricao' != f.name
         ]
+
+    @staticmethod
+    def options_description():
+        return {
+            'tema': 'Tema do mundo: ',
+            'mundo': 'O nome desse mundo: ',
+            'historia_mundo': 'História do mundo: ',
+            'era': 'O tempo em que se passa a história: ',
+            'ambiente': 'Detalhes sobre o ambiente: ',
+            'problema_ambiente': 'Problemas enfrentados:',
+            'regra': 'Regra/Leis deste mundo: ',
+            'detalhe': 'Detalhes pessoais, fisiológicos e outros que definam bem os jogadores: ',
+            'historia_jogador': 'A história dos jogadores, por que estão ali?: ',
+            'rotina': 'Sua rotina no mundo criado: ',
+            'envolvimento': 'O tipo de envolvimento social que ocorre no mundo criado: ',
+            'personagens_secundarios': 'Personagens secundários: ',
+            'problema_jogador': 'Problemas enfrentados:',
+            'hierarquias': 'Hierarquias: ',
+            'vilao': 'Crie um vilão: ',
+            'acontecimento': 'Algo que aconteceu fora do comum, ou planejado: ',
+            'emboscada': 'Foi uma emboscada?: ',
+            'feridos': 'Alguém saiu ferido ou sequestrado?: ',
+            'viloes': 'Era um ou mais vilões?:',
+            'plano_maligno': 'Tem um plano maligno?: ',
+            'enredo': 'O que vai acontecer no mundo e com os jogadores?: ',
+            'fim': 'É importante trabalhar o acontecimento até o fim da história: ',
+            'herois': 'Quem pode auxiliar a resolver esses problemas? (Vamos chamar os heróis): ',
+            'novo_mundo': 'Informe como será o novo mundo (caso ocorram modificações ou trocas): ',
+            'objetivo': 'Qual o objetivo do jogador?: ',
+            'desejos': 'Quais os seus maiores desejos, que o impulsionam para trilhar essa jornada?: ',
+            'obstaculos': 'Os obstáculos que ele vai encontrar ao longo do caminho que está traçando rumo a seu objetivo?: ',
+            'recompensa_jogo': 'Que tipos de recompensas ele pode encontrar pelo caminho?: ',
+            'premio': 'Será premiado?: ',
+            'segredo': 'Tem algum segredo envolvido na trama?: ',
+            'jornada': 'A jornada vai ser longa?: ',
+            'reconhecimento': 'As pessoas irão reconhecê-lo como um herói?: ',
+            'item': 'Vai ter algo que o jogador vai recolher como item de colecionador?: ',
+            'punicao': 'Existe algum tipo de punição?: ',
+            'desafio': 'O Desafio Final: ',
+        }
 
 
 class Perfil(models.Model):
