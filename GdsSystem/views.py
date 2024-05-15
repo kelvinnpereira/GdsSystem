@@ -123,7 +123,7 @@ class ProjetoUsuarioAPI(APIView):
             "messages": [
                 {
                     "role": "user",
-                    "content": f"Monte o enredo de uma história com os seguintes temas:\n{"\n".join(description)}"
+                    "content": f'Monte o enredo de uma história com os seguintes temas:\n{"\n".join(description)}'
                 }
             ],
         }
