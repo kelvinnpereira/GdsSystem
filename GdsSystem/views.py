@@ -110,7 +110,7 @@ class ProjetoUsuarioAPI(APIView):
             return Response({'error': 'Missing or Invalid fields'})
         # ----------------------------------------Chat GPT request----------------------------------------
         headers = {
-            'Authorization': f'Bearer {os.environ.get('OPENAI_API_KEY')}',
+            'Authorization': f'Bearer {os.environ.get("OPENAI_API_KEY")}',
             'Content-Type': 'application/json'
         }
         options_description = Projeto.options_description()
