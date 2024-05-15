@@ -118,12 +118,13 @@ class ProjetoUsuarioAPI(APIView):
             f'{options_description[key]}{data[key]}'
             for key in options_description
         ]
+        description = "\n".join(description)
         req_data = {
             "model": "gpt-3.5-turbo",
             "messages": [
                 {
                     "role": "user",
-                    "content": f'Monte o enredo de uma história com os seguintes temas:\n{"\n".join(description)}'
+                    "content": f'Monte o enredo de uma história com os seguintes temas:\n{description}'
                 }
             ],
         }
