@@ -106,8 +106,6 @@ class ProjetoUsuarioAPI(APIView):
 
     def post(self, request, pk=None):
         data = request.data.dict()
-        if not all([field in data for field in Projeto.fields_to_create()]):
-            return Response({'error': 'Missing or Invalid fields'})
         # ----------------------------------------Chat GPT request----------------------------------------
         headers = {
             'Authorization': f'Bearer {os.environ.get("OPENAI_API_KEY")}',
@@ -115,7 +113,7 @@ class ProjetoUsuarioAPI(APIView):
         }
         options_description = Projeto.options_description()
         description = [
-            f'{options_description[key]}{data[key]}'
+            f'{options_description[key]}: {data[key]}'
             for key in options_description
         ]
         description = "\n".join(description)
@@ -124,7 +122,80 @@ class ProjetoUsuarioAPI(APIView):
             "messages": [
                 {
                     "role": "user",
-                    "content": f'Monte o enredo de uma história com os seguintes temas:\n{description}'
+                    "content": f'''Chatgpt com base nas respostas abaixo crie uma narrativa para esta gamificação, em estilo de roteiro tendo um início, o clímax da história, que é o ponto alto da narrativa com a tarefa mais difícil e o fim.
+
+                        As respostas estão descritas a seguir:
+                        
+                        {description}
+                        
+                        Siga essa estrutura e seja breve, não enrole muito:
+                        
+                        1. Introdução
+                        Faça um parágrafo dando caracteristicas para esse mundo, pois é ele o palco de todos os
+                        acontecimentos. O nome desse mundo? Histórico do mundo, O tempo em que se passa a história, Detalhes sobre o ambiente, Problemas enfrentados caso haja algum problema para enfrentar, Regra/Leis deste mundo.
+                        
+                        2. Fale sobre o JOGADOR
+                        
+                        Faça um parágrafo sobre Detalhes pessoais, fisiológicos e outros que definam bem os jogadores. contando a história dos jogadores, por que estão ali?,  Sua rotina no mundo criado, O tipo de envolvimento social que ocorre no mundo criado
+                        
+                        3. Conte a trama
+                        
+                        Neste parágrafo diga o que rolou de diferente, diga quem é o vilão (lembre-se de vincular a história do mundo, ele não precisa ser uma pessoa, pode ser um acontecimento também ou outra coisa que desestabilizou o mundo do herói). Algo que aconteceu fora do comum, ou planejado?  Foi uma emboscada? Alguém saiu ferido ou sequestrado? Era um ou mais vilões? Tem um plano maligno? O que vai acontecer no mundo e com os jogadores? É importante trabalhar o acontecimento até o fim da história. Quem pode auxiliar a resolver esses problemas? (Vamos chamar os heróis)
+                        
+                        4. Chegou a hora de fazer a “Chamada” para missão.
+                        
+                        Neste parágrafo Informe como será o novo mundo (caso ocorram modificações ou trocas). Qual o objetivo do jogador? Quais os seus maiores desejos, que o impulsionam para trilhar essa jornada? Os obstáculos que ele vai encontrar ao longo do caminho que está traçando rumo a seu objetivo?Que tipos de recompensas ele pode encontrar pelo caminho? Sera premiado? Tem algum segredo envolvido na trama? A jornada vai ser longa? As pessoas irão reconhece-lo como um herói? Como ele vai saber que está avançando e indo no caminho certo? Seria bom usar um mapa? Vai ter algo que o jogador vai recolher como item de colecionador? Existe algum tipo de punição? É importante deixar clara a progressão do jogador, mencionando sobre o que lhe espera no desafio final, fazendo analogia com a aplicação mais difícil de todas. Existe trabalho em equipe? Se for trabalhar com equipes, como você as formaria dentro dessa proposta? Mistura entre mais velhos e mais novos? Seria um balanceamento por algum tipo de nota? Ou divisão de grupos apenas por quantidade de participantes, escolhendo cada um de forma aleatória? Diga-nos a sua lógica.
+                        
+                        5. Sobre pontuação:
+                        
+                        - Pense em uma pontuação que envolva as avaliações, os ganhos e
+                        comportamentos durante o percurso do jogador.
+                        - Faça uma lista de emblemas, distintivos ou outras formas de pontuação que serão utlizados e seus nomes para esta gamificação de acordo com o tema.
+                        - O que acontece se uma pessoa não cumprir uma missão? Tem como
+                        recuperar esse ponto?
+                        - Presença conta como ponto?
+                        - Lembre-se de deixar clara a forma como os pontos são calculados. Ex:
+                        Missões realizadas + Ganhos + Presença = Proximo Lvl de XP
+                        
+                        6. Para a missão:
+                        
+                        - Título da fase.
+                        - Conteúdo de aprendizagem que será explorado
+                        - Local onde ocorre.
+                        - Envolvido externos.
+                        - Inimigos presentes na fase.
+                        - Descreva o problema (Caso exista).
+                        - Descreva o objetivo do jogador.
+                        - Defina a missão de acordo com o conteúdo de aprendizagem
+                        - O que acontece se alguém não conseguir completar a missão?
+                        - Uma missão não concluída pode ser substituída por outra forma de ganho
+                        de pontos? Como a pessoa pode se redimir nesse caso?
+                        - No mínimo 1 (um) desafio.
+                        
+                        7.O Desafio Final - Esse é o momento onde os jogadores vão se deparar com o
+                        maior dos obstáculos.
+                        
+                        É PRECISO...
+                        - Explorar o vilão ao máximo.
+                        - Conectar a etapa com alguns elementos encontrados pela jornada do herói,
+                        para gerar flashbacks.
+                        - Fazer com que o jogador entenda que tudo que ele já viu durante a jornada deve
+                        ser usado agora.
+                        - Dar dicas sobre o que deve ser feito para poder vencer esta etapa. 
+                        - A aula/conteúdo mais complexo deve ser aplicada neste estágio.
+                        - Lembre-se de fazer com que o jogador utilize as habilidades que desenvolveu durante a
+                        sua jornada
+                        
+                        8. Analise as pontuações e parabenize os jogadores conforme o placar de classificação.
+                        
+                        - É importante acompanhar o placar de pontos.
+                        - Missões realizadas + Ganhos + Presença = XP
+                        
+                        Você decide a premiação, seria a chance de se gabar? Quais as conquistas dos heróis lembrem que elas têm que estar ligadas a participação, conhecimento, cumprimento das missões.
+                        
+                        9. Conclusão da História:
+                        
+                        - Finalize a história, fale sobre como tudo voltou ao normal, ou como tudo mudou a partir das ações realizadas pelo jogador.'''
                 }
             ],
         }
@@ -135,10 +206,13 @@ class ProjetoUsuarioAPI(APIView):
         else:
             return Response({'error': 'Não foi possivel criar a descrição do projeto com IA'})
         # ----------------------------------------Chat GPT request----------------------------------------
+        imagem = data['imagem']
+        del data['imagem']
         obj_to_create = {
-            **data,
-            'emboscada': bool(data['emboscada']),
-            'feridos': bool(data['feridos']),
+            'titulo': data['titulo'],
+            'descricao': data['descricao'],
+            'imagem': imagem,
+            'campos': data,
             'usuario': request.user,
         }
         try:
