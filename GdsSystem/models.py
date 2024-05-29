@@ -44,13 +44,10 @@ class Projeto(models.Model):
             'duracao': 'Qual a duração estimada da gamificação? (em minutos, horas, dias)',
             'assunto': 'Qual o assunto que deseja que aprendam?',
             'local': 'Onde a gamificação será realizada?',
-            'participantes': 'Sobre os participantes',
             'pessoas': 'Quantas pessoas participarão da atividade gamificada?',
             'idade': 'Qual a faixa etária dos participantes?',
             'perfil': 'Qual é o perfil dos participantes, o que eles gostam?',
-            'narrativa': 'Envolvendo a narrativa',
             'tema': 'Tema principal da gamificação',
-            'personalizacao': 'Personalização',
             'personalizar': 'Os participantes terão a oportunidade de personalizar suas experiências na gamificação?',
             'titulo': 'Titulo',
         }
