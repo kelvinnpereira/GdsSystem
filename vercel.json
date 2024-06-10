@@ -26,5 +26,10 @@
       "src": "/(.*)",
       "dest": "GdsSystem/wsgi.py"
     }
-  ]
+  ],
+  "functions": {
+    "*.py": {
+      "maxDuration": 60
+    }
+  }
 }
