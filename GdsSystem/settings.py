@@ -75,7 +75,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'GdsSystem.wsgi.application'
+WSGI_APPLICATION = 'GdsSystem.wsgi.app'
 
 
 # Database
