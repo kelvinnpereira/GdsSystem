@@ -28,6 +28,7 @@ urlpatterns = [
     path('token', obtain_auth_token, name='token'),
     path('create_user', UserCreateView.as_view(), name='create_user'),
     path('perfil', PerfilAPI.as_view(), name='perfil'),
+    path('perfil/<pk>', PerfilAPI.as_view(), name='perfil'),
     path('projeto', ProjetoAPI.as_view(), name='projeto'),
     path('projeto/<pk>', ProjetoAPI.as_view(), name='projeto'),
     path('projeto_usuario', ProjetoUsuarioAPI.as_view(), name='projeto_usuario'),

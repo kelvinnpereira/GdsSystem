@@ -10,23 +10,11 @@ class Projeto(models.Model):
     descricao = models.TextField(default=None, null=True, blank=True)
     imagem = models.FileField(default=None, null=True, blank=True)
     campos = models.JSONField(default=dict)
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='usuario_set')
     criado_em = models.DateField(auto_now_add=True)
-    likes = models.IntegerField(null=True, blank=True, default=0)
-    visualizacoes = models.IntegerField(null=True, blank=True, default=0)
-
-    @staticmethod
-    def fields_to_create():
-        return [
-            f.name
-            for f in Projeto._meta.fields + Projeto._meta.many_to_many
-            if 'id' != f.name
-            and 'criado_em' != f.name
-            and 'usuario' != f.name
-            and 'likes' != f.name
-            and 'visualizacoes' != f.name
-            and 'descricao' != f.name
-        ]
+    curtidas = models.ManyToManyField(User, blank=True, related_name='curtidas_set')
+    visualizacoes = models.ManyToManyField(User, blank=True, related_name='visualizacoes_set')
+    comentarios = models.ManyToManyField(User, blank=True, through='Comentario', related_name='comentarios_set')
 
     @staticmethod
     def options_description():
@@ -51,6 +39,12 @@ class Projeto(models.Model):
             'personalizar': 'Os participantes terão a oportunidade de personalizar suas experiências na gamificação?',
             'titulo': 'Titulo',
         }
+
+
+class Comentario(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    projeto = models.ForeignKey(Projeto, on_delete=models.CASCADE)
+    comentario = models.TextField(default=None, null=True, blank=True)
 
 
 class Perfil(models.Model):
