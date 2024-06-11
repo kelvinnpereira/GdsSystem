@@ -108,7 +108,7 @@ class ProjetoAPI(APIView):
                             'comentario': comentario.comentario,
                             'usuario': f'{comentario.usuario.first_name} {comentario.usuario.last_name}'
                         }
-                        for comentario in list(projeto.comentarios.through.objects.all())
+                        for comentario in Comentario.objects.filter(projeto_id=int(pk))
                     ]
                 }
             })
