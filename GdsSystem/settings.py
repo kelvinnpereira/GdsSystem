@@ -158,4 +158,4 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
-CSRF_TRUSTED_ORIGINS = ['https://gds-system-server-48ae9d941d52.herokuapp.com']
+CSRF_TRUSTED_ORIGINS = ['https://gds-system-server2-056dd24e05d4.herokuapp.com']
